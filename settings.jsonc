@@ -1,9 +1,9 @@
 {
     "version": "0.3.01",
     "common_args": {
-        "model_name_or_path": "./models/Qwen2.5-7B-Instruct",
+        "model_name_or_path": "./models/Qwen3-30B-A3B-Instruct-2507",
         "adapter_name_or_path": "./model_output", //同时做为train_sft_args的output_dir
-        "template": "qwen",
+        "template": "qwen3",
         "default_system": "请你扮演一名人类，不要说自己是人工智能",
         "media_dir": "dataset/media",
         "finetuning_type": "lora",
