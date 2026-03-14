@@ -1,3 +1,4 @@
+import os
 from dataclasses import dataclass
 from typing import List, Optional, cast
 
@@ -27,6 +28,7 @@ class PIIDetector:
     def __init__(self, language: str = "en", threshold: float = 0.5):
         self.language = language
         self.threshold = threshold
+        self.batch_n_process = self._get_batch_n_process()
 
         self._init_engines()
         self.anonymizer = AnonymizerEngine()
@@ -37,6 +39,17 @@ class PIIDetector:
         ]
         if self.language == "en":
             logger.info(f"Privacy filtered entity types: {self.filtered_entities}")
+
+    def _get_batch_n_process(self) -> int:
+        raw_value = os.environ.get("WECLONE_PII_N_PROCESS", "1")
+        try:
+            n_process = max(1, int(raw_value))
+        except ValueError:
+            logger.warning(
+                f"Invalid WECLONE_PII_N_PROCESS={raw_value!r}, falling back to single-process PII analysis."
+            )
+            n_process = 1
+        return n_process
 
     def _init_engines(self):
         model_mapping = {
@@ -176,7 +189,7 @@ class PIIDetector:
             language=self.language,
             entities=self.filtered_entities,
             score_threshold=self.threshold,
-            n_process=24,
+            n_process=self.batch_n_process,
             batch_size=32,
         )
 
